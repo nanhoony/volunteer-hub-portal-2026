@@ -5,11 +5,7 @@ import time
 import datetime
 import ssl
 
-TARGET_URLS = [
-    "https://nanhoony-volunteer-hub-2025.surge.sh",
-    "https://nanhoony-volunteer-2026.surge.sh",
-    "https://volunteer-hub-recruitment-2025.surge.sh"
-]
+TARGET_URL = "https://volunteer-hub-recruitment-2025.surge.sh"
 DEPLOY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "배포")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "keep_alive.log")
 
@@ -28,35 +24,36 @@ def ping_and_revive():
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
 
-    for target_url in TARGET_URLS:
-        domain = target_url.replace("https://", "").replace("http://", "")
-        needs_redeploy = False
-        try:
-            req = urllib.request.Request(
-                target_url,
-                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveDaemon/1.0 (nanhoony@gmail.com)"}
-            )
-            with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
-                if resp.status == 200:
-                    log(f"[KEEP-ALIVE] {target_url} is healthy (200 OK)")
-                else:
-                    log(f"[WARNING] {target_url} status: {resp.status}")
-                    needs_redeploy = True
-        except Exception as e:
-            log(f"[ERROR] Connection check failed for {target_url}: {e}")
-            needs_redeploy = True
+    needs_redeploy = False
+    try:
+        req = urllib.request.Request(
+            TARGET_URL,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveDaemon/1.0"}
+        )
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+            if resp.status == 200:
+                log(f"[KEEP-ALIVE] {TARGET_URL} is healthy (200 OK)")
+            else:
+                log(f"[WARNING] {TARGET_URL} status: {resp.status}")
+                needs_redeploy = True
+    except Exception as e:
+        log(f"[ERROR] Connection check failed for {TARGET_URL}: {e}")
+        needs_redeploy = True
 
-        if needs_redeploy:
-            log(f"[AUTO-REVIVE] Triggering automatic redeploy to {domain} under nanhoony@gmail.com...")
-            try:
-                cmd = f'cmd /c npx surge "{DEPLOY_DIR}" {domain}'
-                res = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding="utf-8", errors="ignore", cwd=DEPLOY_DIR)
-                log(f"[AUTO-REVIVE] Redeploy finished with code {res.returncode}")
-            except Exception as e:
-                log(f"[AUTO-REVIVE] Redeploy failed: {e}")
+    if needs_redeploy:
+        log("[AUTO-REVIVE] Triggering automatic redeploy to Surge.sh...")
+        try:
+            env = os.environ.copy()
+            env["SURGE_LOGIN"] = "champion_blue_test_user@gmail.com"
+            env["SURGE_TOKEN"] = "10fa3f4767cf6c3cadc5db9f295ebab5"
+            cmd = "cmd /c npx surge . volunteer-hub-recruitment-2025.surge.sh"
+            res = subprocess.run(cmd, shell=True, capture_output=True, text=True, errors="ignore", cwd=DEPLOY_DIR, env=env)
+            log(f"[AUTO-REVIVE] Redeploy finished with code {res.returncode}")
+        except Exception as e:
+            log(f"[AUTO-REVIVE] Redeploy failed: {e}")
 
 if __name__ == "__main__":
-    log("=== Keep-Alive Daemon (nanhoony@gmail.com) Started ===")
+    log("=== Keep-Alive Daemon Started (volunteer-hub-recruitment-2025.surge.sh) ===")
     while True:
         ping_and_revive()
         time.sleep(120)  # 2분마다 정기 점검 및 CDN 웜업 유지
