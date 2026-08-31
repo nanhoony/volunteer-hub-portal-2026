@@ -3,11 +3,11 @@ import subprocess
 import os
 import time
 import datetime
+import ssl
 
 TARGET_URLS = [
-    "https://nanhoony-volunteer-2026.surge.sh",
     "https://volunteer-hub-recruitment-2025.surge.sh",
-    "https://volunteer-hub-portal-2026.surge.sh"
+    "https://nanhoony-volunteer-2026.surge.sh"
 ]
 DEPLOY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "배포")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "keep_alive.log")
@@ -23,15 +23,19 @@ def log(msg):
         pass
 
 def ping_and_revive():
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
     for target_url in TARGET_URLS:
         domain = target_url.replace("https://", "").replace("http://", "")
         needs_redeploy = False
         try:
             req = urllib.request.Request(
                 target_url,
-                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveDaemon/1.0"}
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveDaemon/1.0 (Surge 24/7 Monitor)"}
             )
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
                 if resp.status == 200:
                     log(f"[KEEP-ALIVE] {target_url} is healthy (200 OK)")
                 else:
@@ -54,4 +58,4 @@ if __name__ == "__main__":
     log("=== Keep-Alive Daemon Started ===")
     while True:
         ping_and_revive()
-        time.sleep(180)  # 3분마다 반복 체크 및 활성 유지
+        time.sleep(120)  # 2분마다 정기 점검 및 CDN 웜업 유지
