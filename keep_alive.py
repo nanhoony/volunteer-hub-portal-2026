@@ -6,8 +6,9 @@ import datetime
 import ssl
 
 TARGET_URLS = [
-    "https://volunteer-hub-recruitment-2025.surge.sh",
-    "https://nanhoony-volunteer-2026.surge.sh"
+    "https://nanhoony-volunteer-hub-2025.surge.sh",
+    "https://nanhoony-volunteer-2026.surge.sh",
+    "https://volunteer-hub-recruitment-2025.surge.sh"
 ]
 DEPLOY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "배포")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "keep_alive.log")
@@ -34,7 +35,7 @@ def check_and_revive():
         try:
             req = urllib.request.Request(
                 target_url,
-                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveBot/1.0 (Surge Health Monitoring)"}
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveBot/1.0 (nanhoony@gmail.com)"}
             )
             with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
                 if resp.status == 200:
@@ -48,7 +49,7 @@ def check_and_revive():
             needs_redeploy = True
 
         if needs_redeploy:
-            log(f"[{domain}] Triggering auto-redeploy to Surge.sh...")
+            log(f"[{domain}] Triggering auto-redeploy to Surge.sh under nanhoony@gmail.com...")
             try:
                 cmd = f'cmd /c npx surge "{DEPLOY_DIR}" {domain}'
                 res = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding="utf-8", errors="ignore", cwd=DEPLOY_DIR)
