@@ -5,6 +5,7 @@ import sys
 import datetime
 
 TARGET_URLS = [
+    "https://nanhoony-volunteer-2026.surge.sh",
     "https://volunteer-hub-recruitment-2025.surge.sh",
     "https://volunteer-hub-portal-2026.surge.sh"
 ]
@@ -46,7 +47,7 @@ def check_and_revive():
             log(f"[{domain}] Triggering auto-redeploy to Surge.sh...")
             try:
                 cmd = f'cmd /c npx surge "{DEPLOY_DIR}" {domain}'
-                res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=DEPLOY_DIR)
+                res = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding="utf-8", errors="ignore", cwd=DEPLOY_DIR)
                 log(f"[{domain}] Redeploy finished with return code {res.returncode}")
             except Exception as e:
                 log(f"[{domain}] Error during redeploy: {e}")
