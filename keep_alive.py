@@ -4,7 +4,7 @@ import os
 import sys
 import datetime
 
-TARGET_URL = "https://volunteer-hub-recruitment-2025.surge.sh"
+TARGET_URL = "https://volunteer-hub-portal-2026.surge.sh"
 DEPLOY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "배포")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "keep_alive.log")
 
@@ -39,11 +39,7 @@ def check_and_revive():
     if needs_redeploy:
         log("Triggering auto-redeploy to Surge.sh...")
         try:
-            # 먼저 기존 도메인 teardown 후 재배포하여 451 오류 및 캐시 문제 해결
-            cmd_teardown = 'cmd /c npx surge teardown volunteer-hub-recruitment-2025.surge.sh'
-            subprocess.run(cmd_teardown, shell=True, capture_output=True, text=True, cwd=DEPLOY_DIR)
-            
-            cmd = f'cmd /c npx surge "{DEPLOY_DIR}" volunteer-hub-recruitment-2025.surge.sh'
+            cmd = f'cmd /c npx surge "{DEPLOY_DIR}" volunteer-hub-portal-2026.surge.sh'
             res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=DEPLOY_DIR)
             log(f"Redeploy finished. Return code: {res.returncode}")
             if res.stdout:

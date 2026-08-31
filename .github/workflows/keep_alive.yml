@@ -34,7 +34,7 @@ jobs:
           import urllib.request
           import os
 
-          url = "https://volunteer-hub-recruitment-2025.surge.sh"
+          url = "https://volunteer-hub-portal-2026.surge.sh"
           print(f"Checking health for: {url}")
           req = urllib.request.Request(
               url,
@@ -63,7 +63,6 @@ jobs:
           SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
         run: |
-          echo "Triggering cloud teardown and redeployment to Surge.sh..."
-          npx surge teardown volunteer-hub-recruitment-2025.surge.sh || true
-          npx surge "./배포" volunteer-hub-recruitment-2025.surge.sh
+          echo "Triggering cloud redeployment to Surge.sh..."
+          npx surge "./배포" volunteer-hub-portal-2026.surge.sh
           echo "Redeployment completed successfully!"
