@@ -1,0 +1,68 @@
+name: 24/7 Surge Keep-Alive & Auto-Revive
+
+on:
+  schedule:
+    # 30분마다 클라우드에서 자동 실행
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  health_check:
+    name: Check Surge Website & Auto-Revive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Keep-Alive Health Check
+        id: health_check
+        run: |
+          python - << 'EOF'
+          import urllib.request
+          import os
+
+          url = "https://volunteer-hub-recruitment-2025.surge.sh"
+          print(f"Checking health for: {url}")
+          req = urllib.request.Request(
+              url,
+              headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) GitHubActionsKeepAlive/1.0"}
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=15) as resp:
+                  print(f"HTTP Status: {resp.status}")
+                  if resp.status == 200:
+                      print("Site is UP and healthy (200 OK)!")
+                      with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                          f.write("needs_redeploy=false\n")
+                  else:
+                      print(f"Unexpected status code: {resp.status}")
+                      with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                          f.write("needs_redeploy=true\n")
+          except Exception as e:
+              print(f"Connection failed / Site DOWN: {e}")
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                  f.write("needs_redeploy=true\n")
+          EOF
+
+      - name: Auto-Revive (Redeploy to Surge if Down)
+        if: steps.health_check.outputs.needs_redeploy == 'true'
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+        run: |
+          echo "Triggering cloud redeployment to Surge.sh..."
+          npx surge "./배포" volunteer-hub-recruitment-2025.surge.sh
+          echo "Redeployment completed successfully!"
