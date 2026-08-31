@@ -4,7 +4,7 @@ import os
 import time
 import datetime
 
-TARGET_URL = "https://volunteer-hub-portal-2026.surge.sh"
+TARGET_URL = "https://volunteer-hub-recruitment-2025.surge.sh"
 DEPLOY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "배포")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "keep_alive.log")
 
@@ -38,7 +38,7 @@ def ping_and_revive():
     if needs_redeploy:
         log("[AUTO-REVIVE] Triggering automatic redeploy to Surge.sh...")
         try:
-            cmd = f'cmd /c npx surge "{DEPLOY_DIR}" volunteer-hub-portal-2026.surge.sh'
+            cmd = f'cmd /c npx surge "{DEPLOY_DIR}" volunteer-hub-recruitment-2025.surge.sh'
             res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=DEPLOY_DIR)
             log(f"[AUTO-REVIVE] Redeploy finished with code {res.returncode}")
         except Exception as e:
