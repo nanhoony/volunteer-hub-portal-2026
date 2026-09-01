@@ -29,7 +29,7 @@ def check_and_revive():
     try:
         req = urllib.request.Request(
             TARGET_URL,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveBot/1.0"}
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAliveBot/1.0 (nanhoony@gmail.com)"}
         )
         with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
             if resp.status == 200:
@@ -43,11 +43,11 @@ def check_and_revive():
         needs_redeploy = True
 
     if needs_redeploy:
-        log("Triggering auto-redeploy to Surge.sh...")
+        log("Triggering auto-redeploy to Surge.sh under nanhoony@gmail.com...")
         try:
             env = os.environ.copy()
-            env["SURGE_LOGIN"] = "champion_blue_test_user@gmail.com"
-            env["SURGE_TOKEN"] = "10fa3f4767cf6c3cadc5db9f295ebab5"
+            env["SURGE_LOGIN"] = "nanhoony@gmail.com"
+            env["SURGE_TOKEN"] = "1d003a62c2fa3a7481755eb621809050"
             cmd = "cmd /c npx surge . volunteer-hub-recruitment-2025.surge.sh"
             res = subprocess.run(cmd, shell=True, capture_output=True, text=True, errors="ignore", cwd=DEPLOY_DIR, env=env)
             log(f"Redeploy finished with return code {res.returncode}")
